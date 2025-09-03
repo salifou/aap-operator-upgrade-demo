@@ -1,0 +1,14 @@
+apiVersion: automationcontroller.ansible.com/v1beta1
+kind: AutomationControllerBackup
+metadata:
+#  generateName: dev-controller-backup-
+  name: dev-controller-backup-1
+  namespace: ns1
+spec:
+  deployment_name: dev
+  # Delete PVC on delete
+  clean_backup_on_delete: true
+  no_log: true
+  image_pull_policy: IfNotPresent
+  set_self_labels: true
+
