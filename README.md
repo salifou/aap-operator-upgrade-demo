@@ -19,7 +19,7 @@ Demo of AAP cluster-scoped operator upgrade from version 2.4 to 2.5, leveraging 
 2. Backup: Backup AAP controllers
 
 3. Upgrade:
-    - Remove all namespaces from the operator group target namespaces => Do not monitor 
+    - Remove all namespaces from the operator group target namespaces
     - Upgrade AAP operator from 2.4 to 2.5
     - Create new AAP CR in ns1 and ns2
     - Add ns1 to the operator group target namespaces => UPGRADE
@@ -52,6 +52,10 @@ oc apply -f $MANIFEST_DIR/ns1-sub_24.yml
 
 # 3. Approve all install plans in operator namespace if needed
 for ip in $(oc get installplan -oname -n ns1); do oc patch $ip --type merge -p '{"spec":{"approved":true}}' -n ns1; done
+
+# 4. Wait for the install to finish
+CSV=$(oc -n ns1 get csv -oname)
+oc -n ns1 wait $CSV --for jsonpath='{.status.phase}'=Succeeded --timeout 5m
 ```
 
 Validate the operator install
@@ -69,6 +73,9 @@ Deploy Automation Controller in ns1 and ns2 namespace.
 # Deploy Automation Controller in ns1 and ns2 namespace.
 oc apply -f $MANIFEST_DIR/ns1-ac.yml
 oc apply -f $MANIFEST_DIR/ns2-ac.yml
+
+# wait for ns1/AC to be deployed
+oc -n ns1 wait automationcontroller/dev --for condition=Successful --timeout 10m
 ```
 
 
@@ -77,6 +84,9 @@ oc apply -f $MANIFEST_DIR/ns2-ac.yml
 ```sh
 # Backup AC deployed in ns1
 oc create -f $MANIFEST_DIR/ns1-ac-backup.yml
+
+# Wait for the backup to complete
+oc -n ns1 wait automationcontrollerbackup/dev-controller-backup-1 --for condition=Successful --timeout 5m
 ```
 
 
@@ -99,25 +109,70 @@ oc apply -f $MANIFEST_DIR/ns2-aap.yml
 
 #  5. Add ns1 to the operator group target namespaces => upgrade
 oc apply -f $MANIFEST_DIR/ns1-og_watch-ns1.yml
+
+# 6. Wait for the upgrade to complete
+oc -n ns1 wait ansibleautomationplatform/myaap --for condition=Successful --timeout 20m
+
+# start_time=$(date +%s%3N)
+# oc -n ns1 wait ansibleautomationplatform/myaap --for condition=Successful --timeout 20m
+# end_time=$(date +%s%3N)
+# duration_ms=$((end_time - start_time))
+# echo "Execution time: ${duration_ms} ms"
+#
+# Execution time: 379105 ms => ~6.3 minutes
+
+# 7. Post upgrade tasks
+#   - user migration, validation, etc.
+
+# 8. Update OperatorGroup to monitor all namespaces after a successful upgrade
+oc apply -f $MANIFEST_DIR/ns1-og_watch-all.yml
 ```
 
 Validation
 - AC in ns1 namespace is ugraded
 - AC in ns2 namespace is untouched (still 2.4)
 
+Notes
+- Steps 4 to 7 are executed sequentially per batch (upgrade loop)
+- Failure in the upgrade loop => Rollback
+- Post upgrade tasks may include manuall steps.
+    - See [Post Upgrade Steps](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html-single/installing_on_openshift_container_platform/index#aap-post-upgrade)
 
 ### 4. Rollback
 
+#### Option 1: Downgrade and restore from backup
+
+```sh
+# 1. Remove all namespaces from the operator group target namespaces
+oc apply -f $MANIFEST_DIR/ns1-og_watch-none.yml
+
+# 2. Downgrade AAP operator to 2.4
+#
+# Seems like changing channel is not enough ...
+# need to uninstall and reinstall the operator
+#oc apply -f $MANIFEST_DIR/ns1-sub_24.yml
 TODO
+
+# 3. Remove new AAP CR and AC deployment ns1
+oc delete -f $MANIFEST_DIR/ns1-aap.yml
+oc delete -f $MANIFEST_DIR/ns1-ac.yml
+oc delete pvc postgres-15-dev-postgres-15-0  # THIS IS IMPORTANT IF REPLACING EXISTING AC DEPLOYMENT
+
+# 4. Restore from backup
+oc apply -f $MANIFEST_DIR/ns1-ac-restore.yml
+```
 
 ### 5. Clean up
 
 ```sh
 # 1. Delete namespaces
-oc delete -f $MANIFEST_DIR/ns1-ns.yml
-oc delete -f $MANIFEST_DIR/ns2-ns.yml
 oc delete -f $MANIFEST_DIR/ns3-ns.yml
+oc delete -f $MANIFEST_DIR/ns2-ns.yml
+oc delete -f $MANIFEST_DIR/ns1-ns.yml
 
 # 2. Delete released PV
-for pv in $(kubectl get pv | grep Released | awk '{print $1}'); do oc delete pv $pv; done
+for pv in $(oc get pv | grep Released | awk '{print $1}'); do oc delete pv $pv; done
+
+# List all resources in a namespace
+#oc api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get -n <NAMESPACE_NAME>
 ```

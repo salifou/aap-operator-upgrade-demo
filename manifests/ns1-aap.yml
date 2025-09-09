@@ -30,3 +30,5 @@ spec:
 #    database:
 #       database_secret: external-postgres-configuration-eda
 
+  lightspeed:
+    disabled: true
