@@ -7,15 +7,11 @@
 
 ## 1. In Place
 
-The cluster scoped operator is upgraded by changing the subscription channel to the desired version (e.g from `Subscription.spec.channel: stable-2.4-cluster-scoped` to `Subscription.spec.channel: stable-2.5-cluster-scoped`)
+This is the standard approach where the channel is updated to the desired version (e.g. from `stable-2.4-cluster-scoped` to `stable-2.5-cluster-scoped`). This will trigger upgrade of components (AC, HUB, EDA, ect.) managed by the operator. See: [Upgrading AAP operator on OpenShift](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html-single/installing_on_openshift_container_platform/index#operator-upgrade_licensing-gw)
 
-`OperatorGroup.spec.targetNamespaces` can be used to control the upgrade/roll-out order.
+`OperatorGroup.spec.targetNamespaces` can be leveraged to upgrade the namespaces in a controlled manner.
 
-- `OperatorGroup.spec.targetNamespaces)` omitted or empty list => watch all namespaces.
-- `OperatorGroup.spec.targetNamespaces: [ns1, ns2]` => monitor ns1 and ns2 namespace only.
-- `OperatorGroup.spec.targetNamespaces: [non_existent]` => monitor nothing
-
-We can start with `OperatorGroup.spec.targetNamespaces: [non_existent]` and progressively add namespaces (batch) to be upgraded.
+Downtime is inevitable in this case.
 
 ### 1.1 Prerequisites
 
@@ -24,7 +20,7 @@ We can start with `OperatorGroup.spec.targetNamespaces: [non_existent]` and prog
 
 ### 1.2 Steps
 
-- Update the OperatorGroup to monitor no namespace (`OperatorGroup.spec.targetNamespaces: [non_existent]`). 
+- Update the OperatorGroup to unwatch all namespaces (`OperatorGroup.spec.targetNamespaces: [non_existent]`).
 - Backup existing deployments
 - Create `AnsibleAutomationPlatform` CR for each deployment
 - Upgrade the operator to 2.x by changing `Subscription.spec.channel`
@@ -48,7 +44,7 @@ Options
 
 ## 2. Side by Side same cluster
 
-The idea is to run both the current and target AAP operator versions in the same cluster.
+The idea is to run 2 operators instances in the same cluster with same namespaces/deployments and configure each operator to **ONLY** watch one namespace set (original & duplicated).
 
 This can be achieved by:
 1. Restricting the existing OperatorGroup target namespaces to namespaces containing AAP components.
@@ -68,7 +64,9 @@ Note: This worked fine in the lab but **NEEDS TO BE REVIEWED AND VALIDATED by th
 - A new DB for each gateway (new component in 2.5+)
 - Enough OCP capacity for running existing and replicated/duplicated deployments at the same time.
 
+
 ### 2.2 Steps
+
 
 **Preparation:**
 - Restrict existing `OperatorGroup` to ONLY watch namespaces containing AAP components.
