@@ -1,14 +1,15 @@
 apiVersion: automationcontroller.ansible.com/v1beta1
 kind: AutomationControllerRestore
 metadata:
-  name: dev-controller-restore-1
-  namespace: ns1
+  name: dev-ac-restore-1
+  namespace: rs1
 spec:
   no_log: true
   image_pull_policy: IfNotPresent
   set_self_labels: true
   force_drop_db: false
   deployment_name: dev
-  backup_source: Backup CR
-  backup_name: dev-controller-backup-1
+  backup_source: PVC
+  backup_pvc: dev-backup-claim
+  backup_dir: /backups/tower-openshift-backup-2025-09-13-225250
 

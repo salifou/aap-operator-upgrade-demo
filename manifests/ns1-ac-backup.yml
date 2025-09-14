@@ -1,8 +1,7 @@
 apiVersion: automationcontroller.ansible.com/v1beta1
 kind: AutomationControllerBackup
 metadata:
-#  generateName: dev-controller-backup-
-  name: dev-controller-backup-1
+  name: dev-ac-backup-1
   namespace: ns1
 spec:
   deployment_name: dev

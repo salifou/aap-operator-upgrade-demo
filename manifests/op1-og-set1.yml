@@ -5,5 +5,8 @@ metadata:
   namespace: ns1
 spec:
   upgradeStrategy: Default
-  targetNamespaces: ['nonexistent']
+  targetNamespaces:
+    - ns1
+    - ns2
+
 

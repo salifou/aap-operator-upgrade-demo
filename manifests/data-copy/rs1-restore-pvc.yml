@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dev-backup-claim
+  namespace: rs1
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: crc-csi-hostpath-provisioner
+  volumeMode: Filesystem
+
