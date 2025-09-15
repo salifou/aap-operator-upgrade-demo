@@ -4,9 +4,9 @@ AAP cluster scoped operator upgrade minimizing downtime.
 
 This is achieved by:
 - Having 2 operator instances and watching non overlapping namespace sets (set 1 & 2).
-- Replicate existing deployments in the second namespace set.
-- Upgrade the replicas.
-- Cut-over and remove orginal deployments if successful.
+- Replicating existing deployments in the second namespace set.
+- Upgrading the replicas.
+- Cutting over and removing original deployments if successful.
 
 
 ## Initial State
