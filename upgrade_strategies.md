@@ -11,12 +11,13 @@ This is the standard approach where the channel is updated to the desired versio
 
 Downtime is inevitable and no control of namespaces upgrade order by default.
 
-`OperatorGroup.spec.targetNamespaces` can be used to control namespace upgrade order by starting with no namespace and progressively namespaces to be upgraded.
+`OperatorGroup.spec.targetNamespaces` can be used to control namespace upgrade order.
+This is achieved by starting with an empty list (no namespace) and progressively adding namespaces to be upgraded to the list.
 
 
 ### 2. Side by Side Two clusters
 
-We start with 2 OpenShift clusters, AAP components deployed in the first cluster.
+We start with 2 OpenShift clusters, a single cluster scoped AAP operator in each OCP cluster, multiple AAP deployments/namespaces in the first cluster.
 
 1. Replicate AAP deployments in the second cluster
 1. Upgrade replicas
@@ -26,55 +27,14 @@ This approach minimizes downtime by keeping original deployments untouched and r
 
 ### 3. Side by Side One cluster
 
-We start with a single OCP cluster, one AAP operator instance and AAP deployments in multiple namespaces (set 1)
+We start with a single OCP cluster, one cluster scoped AAP operator, multiple AAP deployments/namespaces (set 1)
 
-1. Configure the operator to monitor the first namespace set ONLY.
+1. Configure the operator to monitor the first namespace set **ONLY**.
 1. Create a second namespace set
-1. Deploy a second operator instance monitoring the second namespace set
+1. Deploy a second operator instance monitoring the second namespace set **ONLY**
 1. Replicate the AAP deployments in the second namespace set
 1. Upgrade the replicas (Standard approach)
 1. Cut-over and decommission original deployments 
 
-`OperatorGroup.spec.targetNamespaces` is used to configure the list of namespace monitored by the opertor.
+`OperatorGroup.spec.targetNamespaces` is used to configure the list of namespace monitored by the AAP opertor.
 
-
-## Prerequisites
-
-- AAP operator 2.4 and 2.x available in the catalog (available for install)
-- Persistent Storage
-	- 1 PV for each AAP deployment backup
-	- 1 PV for each Replica (1)
-- Database
-	- 1 DB for each new gateway component
-	- 1 DB for each replica (1)
-- Enough capacity for running original & replicas (1)
-
-(1) Side-by-side only
-
-## Prep tasks
-
-- Prerequisites
-- Review AAP Backup/Restore
-- Step by step upgrade process
-- Test and validation
-- Team dependencies & responsibilities
-- Upgrade automation/scripts
-  - Step/Script to disable/enable scheduled jobs (1)
-  - etc.
-- Customization (nginx, redis, etc.) & Potential Impact
-- Customers
-  - REST endpoints and payload
-  - Changes needed
-  - Communication
-- Sizing of new components
-
-(1) Side-by-side only
-
-## Rollback
-
-### In Place
-- [operator backup/restore]: Downgrade operator and restore from backup.
-- [DB snapshot]: ?
-
-## Side by Side
-Nothing beyond cleaning up replicated deployment and resources.
