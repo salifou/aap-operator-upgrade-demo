@@ -89,9 +89,6 @@ oc -n rs1 wait automationcontrollerrestore/dev-ac-restore-1 --for condition=Succ
 oc -n rs1 wait automationcontroller/dev --for condition=Successful --timeout 10m
 ```
 
-**Notes**
-- May need to disable Scheduled Job to avoid duplicate
-
 ### 6. Upgrade automation controller in rs1 to 2.5
 
 See: [AAP Upgrade on OpenShift](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html-single/installing_on_openshift_container_platform/index#operator-upgrade_licensing-gw)
