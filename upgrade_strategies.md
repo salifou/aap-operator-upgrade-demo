@@ -9,7 +9,7 @@
 
 This is the standard approach where the channel is updated to the desired version (e.g. from `stable-2.4-cluster-scoped` to `stable-2.5-cluster-scoped`). This will trigger the upgrade of components managed by the operator (AC, HUB, EDA, etc.). See: [Upgrading AAP operator on OpenShift](https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/2.5/html-single/installing_on_openshift_container_platform/index#operator-upgrade_licensing-gw)
 
-Downtime is inevitable and no control of namespaces upgrade order by default.
+Downtime is inevitable (upgrade & rollback) and no control of namespaces upgrade order by default.
 
 `OperatorGroup.spec.targetNamespaces` can be used to control namespace upgrade order.
 This is achieved by starting with an empty list (no namespace) and progressively adding namespaces to be upgraded to the list.
@@ -19,9 +19,9 @@ This is achieved by starting with an empty list (no namespace) and progressively
 
 We start with 2 OpenShift clusters, a single cluster scoped AAP operator in each OCP cluster, multiple AAP deployments/namespaces in the first cluster.
 
-1. Replicate AAP deployments in the second cluster
+1. Replicate namespaces and AAP deployments in the second cluster
 1. Upgrade replicas
-1. Cut-over and decommission original deployments successful.
+1. Cut-over and decommission original deployments if successful.
 
 This approach minimizes downtime by keeping original deployments untouched and running until cut-over.
 
