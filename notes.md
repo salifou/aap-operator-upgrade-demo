@@ -38,7 +38,9 @@
 - Document the step-by-step upgrade process
 
 - Automate upgrade where possible
-  - Step/Script to disable/enable scheduled jobs (1)
+  - Backup/Rollback
+  - CRDs creation and deployment
+  - Disable/enable scheduled jobs (1)
   - etc.
 
 - Review existing CRDs, Customization (nginx, redis, etc.) & Potential Impact
