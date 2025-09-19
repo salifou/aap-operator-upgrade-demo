@@ -36,5 +36,5 @@ We start with a single OCP cluster, one cluster scoped AAP operator, multiple AA
 1. Upgrade the replicas (Standard approach)
 1. Cut-over and decommission original deployments 
 
-`OperatorGroup.spec.targetNamespaces` is used to configure the list of namespace monitored by the AAP opertor.
+`OperatorGroup.spec.targetNamespaces` is used to configure the list of namespace monitored by the AAP operator.
 
