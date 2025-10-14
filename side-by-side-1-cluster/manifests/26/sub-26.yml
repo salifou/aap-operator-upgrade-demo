@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: ansible-automation-platform-operator
+  namespace: us1
+spec:
+  channel: fast-2.6-cluster-scoped
+  installPlanApproval: Manual
+  name: ansible-automation-platform-operator
+  source: aap-cloud-index-26
+  sourceNamespace: openshift-marketplace
+  startingCSV: aap-operator.v2.6.0-0.1758169100

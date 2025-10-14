@@ -1,0 +1,20 @@
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  name: myaap
+  namespace: ns1
+spec:
+  no_log: true
+
+  controller:
+    name: dev
+    disabled: false
+
+  hub:
+    disabled: true
+
+  eda:
+    disabled: true
+
+  lightspeed:
+    disabled: true
