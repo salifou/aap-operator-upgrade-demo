@@ -28,15 +28,22 @@
 
 ### 1. Update the AAP 2.4 operator managed namespace list to include ONLY namespaces with existing AAP deployments
 
-```sh
-### 1. Get the OperatorGroup name
-OG_NAME=$(oc -n aap get og -oname)
+a. Get the OperatorGroup name
 
-### 2. Update the 2.4 operator managed namespace list
+```sh
+OG_NAME=$(oc -n aap get og -oname)
+```
+
+b. Update the 2.4 operator managed namespace list
+
+```sh
 oc -n aap patch $OG_NAME --type merge \
   -p '{"spec":{"targetNamespaces":["cti-eng-aap-17176", "cti-eng-aap1-17176", "cti-eng-aap2-17176"]}}'
+```
 
-### 3. Verify
+c. Verify
+
+```sh
 oc -n aap get $OG_NAME -o json | jq '.spec.targetNamespaces'
 
 [
@@ -107,17 +114,30 @@ aap-operator.v2.6.0-0.1761281346   Ansible Automation Platform   2.6.0+0.1761281
 
 ### 3. Upgrade Loop
 
+
+a. Pick a namepace to be upgraded
+
 ```sh
-### 1. Pick a namepace to be upgraded
 export NS=cti-eng-aap2-17176
+```
 
-### 2. Remove the namespace from 2.4 operator group
+b. **[OpenShift Team]** Remove the namespace from 2.4 operator group
+
+```sh
 oc -n aap edit og <AAP OG NAME>   # Remove the namespace from OperatorGroup.spec.targetNamespaces
+```
 
-### 3. Add the namespace from 2.6 operator group
+c. **[OpenShift Team]** Add the namespace from 2.6 operator group
+
+```sh
 oc -n aap26 edit og aap-og   # Add the namespace to OperatorGroup.spec.targetNamespaces
+```
 
-### 4. Follow the doc to complete the upgrade
+d. Follow the doc to complete the upgrade
+
+```sh
+# Create the gateway CR
+
 oc apply -f - <<EOF
 ---
 apiVersion: aap.ansible.com/v1alpha1
@@ -137,16 +157,19 @@ spec:
   lightspeed:
     disabled: true
 EOF
+```
 
-### 5. Wait for upgrade to complete
+e. Wait for upgrade to complete
+
+```sh
 oc -n $NS wait ansibleautomationplatform/myaap --for condition=Successful --timeout 20m
 ```
 
 ---
 
-## APPENDIX
+# APPENDIX
 
-### A. Deploying 2.6 operator using the UI
+## A. Deploying 2.6 operator using the UI
 
 - Got to `Operators -> OperatorHub` search for AAP and click
 - Select `stable-2.6-cluster-scoped` and click on Install
@@ -159,14 +182,14 @@ oc -n $NS wait ansibleautomationplatform/myaap --for condition=Successful --time
 
 ![alt text](./imgs/a_1_26-install-ui.png)
 
-## Screenshots
+# Screenshots
 
-### 1. Prerequisites: AAP 2.4 and 2.6 channels available
+## 1. Prerequisites: AAP 2.4 and 2.6 channels available
 
 ![alt text](./imgs/p_24_26_channels_available.png)
 
 
-### 2. Initial State
+## 2. Initial State
 
 A single AAP 2.4 cluster scoped operator managing all namespaces
 
@@ -176,7 +199,7 @@ Automation Controllers deployments
 
 ![alt text](./imgs/is_1_acs.png)
 
-### 3. Upgrade
+## 3. Upgrade
 
 After updating 2.4 managed namespace list
 
