@@ -15,14 +15,14 @@
 1. [OpenShift Team] Update the AAP 2.4 operator managed namespace list to include ONLY namespaces with existing AAP deployments.
 2. [OpenShift Team] Install AAP 2.6 cluster scoped operator in `aap26`namespace, managing `aap26` namespace ONLY
 3. Upgrade Loop
-    a. Pick a namespace to upgrade
-    b. Backup all deployments in the namespace
-    c. [OpenShift Team] Remove the namespace from list managed by the 2.4 operator
-    d. [OpenShift Team] Add the namespace to the list managed by the 2.6 operator
-    e. Follow the standard approach to complete the upgrade
+    1. Pick a namespace to upgrade
+    2. Backup all deployments in the namespace
+    3. [OpenShift Team] Remove the namespace from list managed by the 2.4 operator
+    4. [OpenShift Team] Add the namespace to the list managed by the 2.6 operator
+    5. Follow the standard approach to complete the upgrade
         - Create the secrects needed (gateway DB, SSL, etc.)
         - Create the gateway custom resource (CR)
-    f. Validate the upgrade
+    6. Validate the upgrade
 4. Repeat step 2. until all namespaces are upgraded
 5. [Optional][OpenShift Team]  Uninstall 2.4 operator and remove `aap` namespace
 
