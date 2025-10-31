@@ -23,7 +23,7 @@
         - Create the secrects needed (gateway DB, SSL, etc.)
         - Create the gateway custom resource (CR)
     6. Validate the upgrade
-4. Repeat step 2. until all namespaces are upgraded
+4. Repeat step 3. until all namespaces are upgraded
 5. [Optional][OpenShift Team]  Uninstall 2.4 operator and remove `aap` namespace
 
 ### 1. Update the AAP 2.4 operator managed namespace list to include ONLY namespaces with existing AAP deployments
